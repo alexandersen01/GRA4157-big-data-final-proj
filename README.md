@@ -40,16 +40,16 @@ The baseline CNN architecture is adapted from an MNIST classifier (99% accuracy)
 - Python 3.8+
 - CUDA-capable GPU (recommended, but works on CPU/MPS)
 - Virtual environment (recommended)
+- [`uv`](https://github.com/astral-sh/uv) for dependency and environment management
 
 ### Installation
 
 ```bash
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# Install dependencies and create .venv from pyproject.toml / uv.lock
+uv sync
 
-# Install dependencies
-pip install -r requirements.txt
+# Activate virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
 ## Running Experiments
@@ -59,10 +59,12 @@ pip install -r requirements.txt
 The easiest way to run experiments with full control:
 
 ```bash
+source .venv/bin/activate  # ensure the uv-created venv is active
 jupyter notebook cifar10_experiments_notebook.ipynb
 ```
 
 The notebook includes:
+
 - Single `SEED` constant for reproducibility
 - Interactive progress monitoring
 - Inline visualizations
@@ -74,16 +76,19 @@ The notebook includes:
 Test the architecture on a small batch:
 
 ```bash
+source .venv/bin/activate
 python flexible_cnn_classifier.py
 ```
 
 Run both experiments from command line:
 
 ```bash
+source .venv/bin/activate
 python cifar10_experiments.py
 ```
 
 This will:
+
 - Download CIFAR-10 (if not cached)
 - Train 4 models for model-wise experiment (~2-4 hours on RTX 5090)
 - Train 1 model for 400 epochs for epoch-wise experiment (~2-3 hours)
@@ -96,18 +101,19 @@ You can modify `cifar10_experiments.py` to run only one experiment by commenting
 
 ## Model Architectures
 
-| Model      | Conv Blocks | Base Filters | FC Hidden | Parameters |
-|------------|-------------|--------------|-----------|------------|
-| Baseline   | 2           | 16           | 64        | ~105,000   |
-| Medium     | 3           | 32           | 128       | ~500,000   |
-| High       | 4           | 64           | 256       | ~2,000,000 |
-| Very High  | 4           | 128          | 512       | ~8,000,000 |
+| Model     | Conv Blocks | Base Filters | FC Hidden | Parameters |
+| --------- | ----------- | ------------ | --------- | ---------- |
+| Baseline  | 2           | 16           | 64        | ~105,000   |
+| Medium    | 3           | 32           | 128       | ~500,000   |
+| High      | 4           | 64           | 256       | ~2,000,000 |
+| Very High | 4           | 128          | 512       | ~8,000,000 |
 
 ## Expected Results
 
 ### Model-wise Double Descent
 
 According to Belkin's theory, we expect test error to:
+
 1. Decrease initially (underparameterized regime)
 2. Potentially increase near interpolation threshold
 3. Decrease again (overparameterized regime)
@@ -115,6 +121,7 @@ According to Belkin's theory, we expect test error to:
 ### Epoch-wise Double Descent
 
 We expect test error to:
+
 1. Improve during initial training
 2. Plateau or slightly degrade (overfitting)
 3. Potentially recover with continued training
@@ -125,16 +132,15 @@ We expect test error to:
 
 - **Minimum**: CPU, 8GB RAM, ~50GB disk space
   - Training time: ~24-48 hours for all experiments
-  
 - **Recommended**: NVIDIA GPU with 8GB+ VRAM
   - Training time: ~4-8 hours for all experiments
-  
 - **Used in project**: NVIDIA RTX 5090 via SSH
   - Training time: ~2-4 hours for all experiments
 
 ## Results
 
 After running experiments, results will be saved to:
+
 - `results/model_wise/all_results.pkl` - Model-wise results
 - `results/epoch_wise/*.pkl` - Epoch-wise results
 - `report/figures/*.pdf` - Publication-ready figures
@@ -160,11 +166,11 @@ Or use your preferred LaTeX IDE (Overleaf, TeXShop, etc.)
 - seaborn
 - numpy
 
-See `requirements.txt` for complete list.
+See `pyproject.toml` / `uv.lock` for the complete, version-locked dependency set.
 
 ## References
 
-- Belkin, M., Hsu, D., Ma, S., & Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias-variance trade-off. *PNAS*, 116(32), 15849-15854.
+- Belkin, M., Hsu, D., Ma, S., & Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias-variance trade-off. _PNAS_, 116(32), 15849-15854.
 - CIFAR-10 Dataset: https://www.cs.toronto.edu/~kriz/cifar.html
 
 ## Author
@@ -176,4 +182,3 @@ Course: GRA4157 - Big Data
 ## License
 
 Academic project - for educational purposes only.
-
