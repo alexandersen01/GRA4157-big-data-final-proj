@@ -538,8 +538,8 @@ def create_results_summary_table(results, save_path="report/figures/results_tabl
 
 def main(seed=42):
 
-    MODEL_WISE_NUM_EPOCHS = 100
-    EPOCH_WISE_NUM_EPOCHS = 2000
+    MODEL_WISE_NUM_EPOCHS = 400
+    EPOCH_WISE_NUM_EPOCHS = 30_000
     #load data
     X_train, X_val, X_test, y_train, y_val, y_test = load_cifar10(seed=seed)
     class_names = get_class_names()
