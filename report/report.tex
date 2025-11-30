@@ -1,0 +1,79 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{eurosym}
+\usepackage[a4paper, total={6in, 8in}, margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{times}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{parskip}
+\usepackage{minted}
+\usepackage{fontawesome}
+\usepackage{natbib}
+
+
+\usemintedstyle{vs}
+\newcommand{\ts}{\textsuperscript}
+
+\title{Final assignment \\ GRA4157}
+
+\author{
+  \textbf{Jakob Sverre Alexandersen}
+%   \thanks{This script is so incredibly baller omd} \\
+%   FSN Labs \\
+\\[1em]
+  \href{mailto:ja.al@fsncapital.com}{\texttt{ja.al@fsncapital.com}} \\[1em]
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+
+% \vspace{2cm}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.4\linewidth]{fsn_labs.png}
+% \end{figure}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+Click me \href{https://github.com/alexandersen01/GRA4157-big-data-final-proj}{\faGithub} to view the full code on Github!
+
+\noindent\rule{\textwidth}{0.4pt}
+
+This final project builds (conceptually) on my second project. A short recap of that was to go in-depth on how CNNs (Convolutional Neural Networks) are actually built. To demonstrate this, I built a relatively simple classifier (found in the \verb|simple_bootleg_cnn_classifier.py| file). Furthermore, I ran it on the well-known MNIST dataset, which is a balanced dataset of $\sim 21,000$ images of the digits 0 to 9. It achieved both an $F1 $ and accuracy score of $99\% $, which is considered industry standard. Since the problem is considered solved, it inspires very little motivation to do further research on the subject. 
+
+In my previous project, I very briefly mentioned Belkin et. al's theory of \textit{double descent} \cite{Belkin_2019}, which challenges the traditional bias-variance tradeoff. The theory posits that test error exhibits non-monotonic relationship with model complexity and training time: performance initially worsens after the interpolation threshold (where the model perfectly fits training data), but surprisingly improves again with further increases in complexity or training epochs. However, MNIST's simplicity, with near-perfect accuracy already achieved, provides limited opportunity to empirically observe this phenomenon. 
+
+To meaningfully test double descent, I require a more challenging dataset where my model has substantial room for improvement. Therefore I will apply my CNN architecture to the CIFAR-10 dataset, which consists of $60,000 $ $32 \times 32 $ color images across 10 classes (airplane, car, bird, cat, deer, dog, frog, horse, ship and truck). CIFAR-10 presents significantly greater complexity due to color channels, natural image variations, and inter-class similarity, typically yielding baseline accuracies of $70 - 85\% $ without advanced techniques. 
+
+The objectives of this project are therefore twofold: \textbf{(1)} to investigate whether double descent can be empirically observed by varying model complexity (number of layers, filters, and parameters), and \textbf{(2)} to examine epoch-wise double descent by training models well beyond typical convergence points. This exploration will provide practical insights into modern deep learning phenomena that remain theoretically incomplete. 
+
+\newpage
+
+\section{Methods}
+
+\newpage
+
+\section{Results}
+
+\newpage
+
+\section{Summary}
+
+\bibliographystyle{alpha}
+\bibliography{sources}
+
+
+\end{document}
