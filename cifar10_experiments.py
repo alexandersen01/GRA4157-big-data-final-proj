@@ -16,6 +16,7 @@ from flexible_cnn_classifier import (
     create_medium_model,
     create_high_model,
     create_very_high_model,
+    create_extreme_model,
 )
 from simple_cnn_classifier import CNNClassifier
 
@@ -124,6 +125,7 @@ def run_model_wise_experiment(
         "Medium": create_medium_model,
         "High": create_high_model,
         "Very High": create_very_high_model,
+        "Extreme": create_extreme_model,
     }
 
     results = {}
@@ -184,6 +186,12 @@ def run_model_wise_experiment(
             pickle.dump(results[model_name], f)
         print(f"saved checkpoint to {checkpoint_path}")
 
+        # explicitly free GPU memory before moving on to the next model
+        if torch.cuda.is_available():
+            del classifier
+            del model
+            torch.cuda.empty_cache()
+
     #save consolidated results
     results_path = Path(results_dir) / "all_results.pkl"
     with open(results_path, "wb") as f:
@@ -205,6 +213,8 @@ def run_epoch_wise_experiment(
     num_epochs=400,
     learning_rate=0.001,
     results_dir="results/epoch_wise",
+    checkpoint_path=None,
+    resume_from=None,
     seed=42,
 ):
     """
@@ -214,7 +224,14 @@ def run_epoch_wise_experiment(
     """
     print("epoch-wise DD")
 
-    Path(results_dir).mkdir(parents=True, exist_ok=True)
+    results_dir = Path(results_dir)
+    results_dir.mkdir(parents=True, exist_ok=True)
+
+    # default checkpoint path (one rolling checkpoint per model)
+    if checkpoint_path is None:
+        checkpoint_path = results_dir / f"{model_name.lower()}_epochwise_checkpoint.pkl"
+    else:
+        checkpoint_path = Path(checkpoint_path)
 
     #select model
     model_creators = {
@@ -223,9 +240,29 @@ def run_epoch_wise_experiment(
         "High": create_high_model,
     }
 
-    print(f"\ntraining {model_name} model for {num_epochs} epochs")
+    # build model
     model = model_creators[model_name](in_channels=3, num_classes=10, seed=seed)
+
+    # load from checkpoint if provided
+    start_epoch = 0
+    previous_history = None
+    if resume_from is not None:
+        resume_from = Path(resume_from)
+        if resume_from.exists():
+            print(f"\nresuming from checkpoint: {resume_from}")
+            with open(resume_from, "rb") as f:
+                checkpoint = pickle.load(f)
+            model.load_state_dict(checkpoint["model_state_dict"])
+            start_epoch = checkpoint.get("num_epochs_trained", 0)
+            previous_history = checkpoint.get("history", None)
+        else:
+            print(f"\nWARNING: resume checkpoint not found at {resume_from}, starting fresh.")
+
     arch_summary = model.get_architecture_summary()
+    print(
+        f"\ntraining {model_name} model from epoch {start_epoch} "
+        f"for additional {num_epochs} epochs (total target ~{start_epoch + num_epochs})"
+    )
     print(f"params: {arch_summary['total_parameters']:,}")
 
     start_time = time.time()
@@ -240,9 +277,20 @@ def run_epoch_wise_experiment(
     )
 
     #train with tracking
-    history = classifier.fit_with_tracking(
+    history_segment = classifier.fit_with_tracking(
         X_train, y_train, X_val, y_val, batch_size=128, verbose=True
     )
+
+    # merge history with any previous history from checkpoint
+    if previous_history is not None:
+        history = {
+            key: previous_history.get(key, []) + history_segment.get(key, [])
+            for key in history_segment.keys()
+        }
+        total_epochs_trained = start_epoch + num_epochs
+    else:
+        history = history_segment
+        total_epochs_trained = num_epochs
 
     #evaluate on test set
     y_pred = classifier.predict(X_test)
@@ -259,7 +307,7 @@ def run_epoch_wise_experiment(
     results = {
         "model_name": model_name,
         "architecture": arch_summary,
-        "num_epochs": num_epochs,
+        "num_epochs": total_epochs_trained,
         "history": history,
         "test_accuracy": test_accuracy,
         "test_f1": test_f1,
@@ -269,12 +317,22 @@ def run_epoch_wise_experiment(
     }
 
     #save results
-    results_path = (
-        Path(results_dir) / f"{model_name.lower()}_epochs_{num_epochs}_results.pkl"
-    )
+    results_path = results_dir / f"{model_name.lower()}_epochs_{total_epochs_trained}_results.pkl"
     with open(results_path, "wb") as f:
         pickle.dump(results, f)
     print(f"\nsaved results to {results_path}")
+
+    # save / update rolling checkpoint and clean up older one if needed
+    checkpoint_dict = {
+        "model_name": model_name,
+        "architecture": arch_summary,
+        "model_state_dict": model.state_dict(),
+        "num_epochs_trained": total_epochs_trained,
+        "history": history,
+    }
+    with open(checkpoint_path, "wb") as f:
+        pickle.dump(checkpoint_dict, f)
+    print(f"saved checkpoint to {checkpoint_path}")
 
     return results
 
@@ -480,7 +538,8 @@ def create_results_summary_table(results, save_path="report/figures/results_tabl
 
 def main(seed=42):
 
-    NUM_EPOCHS = 5
+    MODEL_WISE_NUM_EPOCHS = 100
+    EPOCH_WISE_NUM_EPOCHS = 2000
     #load data
     X_train, X_val, X_test, y_train, y_val, y_test = load_cifar10(seed=seed)
     class_names = get_class_names()
@@ -504,7 +563,7 @@ def main(seed=42):
         y_train,
         y_val,
         y_test,
-        num_epochs=NUM_EPOCHS,
+        num_epochs=MODEL_WISE_NUM_EPOCHS,
         learning_rate=0.001,
         seed=seed,
     )
@@ -534,7 +593,7 @@ def main(seed=42):
         y_val,
         y_test,
         model_name="Baseline",  #or 'Medium' depending on which shows better results
-        num_epochs=400,
+        num_epochs=EPOCH_WISE_NUM_EPOCHS,
         learning_rate=0.001,
         seed=seed,
     )

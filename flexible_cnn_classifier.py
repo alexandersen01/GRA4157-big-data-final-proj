@@ -136,12 +136,27 @@ def create_very_high_model(in_channels=3, num_classes=10, seed=42):
     )
 
 
+def create_extreme_model(in_channels=3, num_classes=10, seed=42):
+    """
+    Even higher-capacity model for probing the overparameterized regime.
+    """
+    return FlexibleCNN(
+        in_channels=in_channels,
+        num_conv_blocks=4,
+        base_filters=256,
+        fc_hidden_dim=1024,
+        num_classes=num_classes,
+        seed=seed,
+    )
+
+
 if __name__ == "__main__":
     models = {
         "Baseline": create_baseline_model(),
         "Medium": create_medium_model(),
         "High": create_high_model(),
         "Very High": create_very_high_model(),
+        "Extreme": create_extreme_model(),
     }
 
     for name, model in models.items():

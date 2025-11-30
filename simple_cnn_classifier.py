@@ -128,21 +128,39 @@ class CNNClassifier:
             # TODO: may have to remove this, check the vibes
             if X_val is not None and y_val is not None:
                 self.model.eval()
-                X_val_tensor = (
-                    torch.FloatTensor(X_val)
-                    .view(-1, channels, height, width)
-                    .to(self.device)
+                # move validation through the network in batches to avoid OOM
+                X_val_tensor = torch.FloatTensor(X_val).view(
+                    -1, channels, height, width
                 )
-                y_val_tensor = torch.LongTensor(y_val).to(self.device)
+                y_val_tensor = torch.LongTensor(y_val)
+                val_dataset = TensorDataset(X_val_tensor, y_val_tensor)
+                val_loader = DataLoader(
+                    val_dataset, batch_size=batch_size, shuffle=False
+                )
+
+                val_losses = []
+                all_val_preds = []
+                all_val_targets = []
 
                 with torch.no_grad():
-                    val_outputs = self.model(X_val_tensor)
-                    val_loss = self.loss_fn(val_outputs, y_val_tensor).item()
-                    _, val_preds = torch.max(val_outputs, 1)
-                    val_preds_np = val_preds.cpu().numpy()
+                    for X_val_batch, y_val_batch in val_loader:
+                        X_val_batch = X_val_batch.to(self.device)
+                        y_val_batch = y_val_batch.to(self.device)
 
-                val_accuracy = accuracy_score(y_val, val_preds_np)
-                val_f1 = f1_score(y_val, val_preds_np, average="weighted")
+                        val_outputs = self.model(X_val_batch)
+                        batch_loss = self.loss_fn(val_outputs, y_val_batch).item()
+                        val_losses.append(batch_loss)
+
+                        _, val_preds_batch = torch.max(val_outputs, 1)
+                        all_val_preds.append(val_preds_batch.cpu().numpy())
+                        all_val_targets.append(y_val_batch.cpu().numpy())
+
+                val_loss = float(np.mean(val_losses))
+                val_preds_np = np.concatenate(all_val_preds)
+                val_targets_np = np.concatenate(all_val_targets)
+
+                val_accuracy = accuracy_score(val_targets_np, val_preds_np)
+                val_f1 = f1_score(val_targets_np, val_preds_np, average="weighted")
 
                 self.history["val_loss"].append(val_loss)
                 self.history["val_accuracy"].append(val_accuracy)
