@@ -228,6 +228,20 @@ INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/i
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/courier/pcrr8r.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmri7t.vf
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmri8r.tfm
+INPUT ./figures/image.png
+INPUT ./figures/image.png
+INPUT ./figures/image.png
+INPUT ./figures/image.png
+INPUT ./figures/image.png
+INPUT ./figures/image.png
+INPUT ./figures/image.png
+INPUT ./figures/image3.png
+INPUT ./figures/image3.png
+INPUT ./figures/image3.png
+INPUT ./figures/image3.png
+INPUT ./figures/image3.png
+INPUT ./figures/image3.png
+INPUT ./figures/image3.png
 INPUT ./report.bbl
 INPUT ./report.bbl
 INPUT report.bbl

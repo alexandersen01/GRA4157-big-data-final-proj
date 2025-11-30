@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.4.13)  7 NOV 2025 16:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.4.13)  30 NOV 2025 18:55
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -424,7 +424,12 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 
 [1
 
-{/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map}] (report.toc)
+{/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map}] (report.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 3.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 3.
+)
 \tf@toc=\write5
 \openout5 = `report.toc'.
 
@@ -435,20 +440,28 @@ LaTeX Font Info:    Trying to load font information for U+fontawesometwo on inpu
  (/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/fontawesome/ufontawesometwo.fd
 File: ufontawesometwo.fd 2016/05/22 Font definitions for U/fontawesometwo.
 )
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 55.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 55.
-
 
 [3]
+<figures/image.png, id=54, 1193.45876pt x 592.2125pt>
+File: figures/image.png Graphic file (type png)
+<use figures/image.png>
+Package pdftex.def Info: figures/image.png  used on input line 75.
+(pdftex.def)             Requested size: 452.9679pt x 224.77199pt.
+<figures/image3.png, id=55, 993.7125pt x 792.9625pt>
+File: figures/image3.png Graphic file (type png)
+<use figures/image3.png>
+Package pdftex.def Info: figures/image3.png  used on input line 84.
+(pdftex.def)             Requested size: 362.37569pt x 289.16876pt.
 
-[4]
 
-[5] (report.bbl)
+[4 <./figures/image.png> <./figures/image3.png>]
 
-[6]
-runsystem(latexminted cleantemp  --timestamp 20251107164137 E98D2F001DA5678B39482EFBDF5770DC)...disabled (restricted).
+[5]
+
+[6] (report.bbl)
+
+[7]
+runsystem(latexminted cleantemp  --timestamp 20251130185554 E98D2F001DA5678B39482EFBDF5770DC)...disabled (restricted).
 
  (report.aux)
  ***********
@@ -456,20 +469,20 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 907941DA0C20B122EA4623E8E1886B23;337.
+(rerunfilecheck)             Checksum: 4388F9BCAC5C0D36DD1AF68406FD3685;434.
  ) 
 Here is how much of TeX's memory you used:
- 17097 strings out of 473530
- 325872 string characters out of 5697419
- 829314 words of memory out of 5000000
- 40098 multiletter control sequences out of 15000+600000
+ 17116 strings out of 473530
+ 326305 string characters out of 5697419
+ 830317 words of memory out of 5000000
+ 40115 multiletter control sequences out of 15000+600000
  574743 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,6n,79p,744b,473s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/base/8r.enc}{/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/fontawesome/fontawesometwo.enc}</Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/fontawesome/FontAwesome.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/courier/ucrr8a.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmb8a.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmr8a.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (6 pages, 102478 bytes).
+Output written on report.pdf (7 pages, 985304 bytes).
 PDF statistics:
- 103 PDF objects out of 1000 (max. 8388607)
- 14 named destinations out of 1000 (max. 500000)
- 33 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 116 PDF objects out of 1000 (max. 8388607)
+ 16 named destinations out of 1000 (max. 500000)
+ 51 words of extra memory for PDF output out of 10000 (max. 10000000)
 

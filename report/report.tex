@@ -66,7 +66,25 @@ Remember to mention that I ran into an OOM issue, which is why I oved the valida
 
 \section{Methodology}
 
+\subsection{Data}
 
+Before we dive into the architectures of the different models and other techincals, it is important to achieve an understanding of the data itself. Therefore we start off by seeing how the distribution of the data looks like, to ensure that the data is indeed balanced.  
+
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[width=1\textwidth]{figures/image.png}
+\end{figure}
+
+The data is balanced, which means that we will not accidentally train a biased model that performs poorly on underrepresented classes. If that were the case, the model may have struggled to correctly identify the classes with fewer examples, potentially resulting in lower accuracy and recall for those classes. 
+
+If we run a $t$SNE analysis on the test set, we get this plot: 
+
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[width=0.8\textwidth]{figures/image3.png}
+\end{figure}
+
+I can already tell from here that the model is not going spark impressive feedback, as the classes are very mixed into each other, and there is no clear separation between clusters. (TALK MORE ABOUT TSNE AND THIS IF ROOM ALSO ADD PICTURE OF IMAGES)
 
 \newpage
 
