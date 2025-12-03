@@ -6,30 +6,27 @@ Final project for GRA4157 - Big Data, investigating Belkin et al.'s double desce
 
 This project tests the double descent phenomenon on CIFAR-10 through two complementary experiments:
 
-1. **Model-wise Double Descent**: Training models of varying complexity (105k to 8M parameters)
-2. **Epoch-wise Double Descent**: Training a single model for 400+ epochs
+1. **Width-Sweep Double Descent**: Training models of varying width (fine-grained model-wise DD)
+2. **Epoch-wise Double Descent**: Training a larger model for many epochs
 
-The baseline CNN architecture is adapted from an MNIST classifier (99% accuracy) to handle RGB images.
+The CNN architecture is adapted from an MNIST classifier (99% accuracy) to handle RGB images, with parameterized width for controlled experiments.
 
 ## Repository Structure
 
 ```
 .
 ├── cifar10_experiments_notebook.ipynb  # Jupyter notebook (RECOMMENDED)
-├── flexible_cnn_classifier.py          # Parameterized CNN with seed support
-├── simple_cnn_classifier.py            # Wrapper with tracking and seed support
-├── simple_bootleg_cnn_classifier.py    # Original MNIST baseline
+├── flexible_cnn_classifier.py          # Parameterized CNN with width scaling
+├── simple_cnn_classifier.py            # Training wrapper with tracking
+├── simple_bootleg_cnn_classifier.py    # Original MNIST baseline (for reference)
 ├── cifar10_experiments.py              # Command-line experiment runner
-├── test_setup.py                       # Setup verification script
-├── quick_test_experiment.py            # Quick validation runner
-├── requirements.txt                    # Python dependencies
 ├── report/
-│   ├── report.tex                      # Main report with Methods section
+│   ├── report.tex                      # Main report
 │   ├── sources.bib                     # Bibliography (Belkin citation)
 │   └── figures/                        # Generated plots
 ├── results/                            # Experiment checkpoints and results
-│   ├── model_wise/
-│   └── epoch_wise/
+│   ├── width_sweep/                    # Width-sweep DD results
+│   └── epoch_wise/                     # Epoch-wise DD results
 └── data/                               # CIFAR-10 dataset cache
 ```
 
@@ -90,8 +87,8 @@ python cifar10_experiments.py
 This will:
 
 - Download CIFAR-10 (if not cached)
-- Train 4 models for model-wise experiment (~2-4 hours on RTX 5090)
-- Train 1 model for 400 epochs for epoch-wise experiment (~2-3 hours)
+- Train width-sweep models (width 1-128) for model-wise DD experiment
+- Train 1 larger model for many epochs for epoch-wise DD experiment
 - Generate all figures in `report/figures/`
 - Save results to `results/`
 
@@ -99,34 +96,42 @@ This will:
 
 You can modify `cifar10_experiments.py` to run only one experiment by commenting out the other in the `main()` function.
 
-## Model Architectures
+## Model Architecture
 
-| Model     | Conv Blocks | Base Filters | FC Hidden | Parameters |
-| --------- | ----------- | ------------ | --------- | ---------- |
-| Baseline  | 2           | 16           | 64        | ~105,000   |
-| Medium    | 3           | 32           | 128       | ~500,000   |
-| High      | 4           | 64           | 256       | ~2,000,000 |
-| Very High | 4           | 128          | 512       | ~8,000,000 |
+The width-sweep experiment uses a 2-block CNN with parameterized width:
+
+| Width Multiplier | Base Filters | FC Hidden | Approx. Parameters |
+| ---------------- | ------------ | --------- | ------------------ |
+| 1                | 8            | 32        | ~3,000             |
+| 10               | 80           | 320       | ~300,000           |
+| 20               | 160          | 640       | ~1,200,000         |
+| 64               | 512          | 2048      | ~12,000,000        |
+| 128              | 1024         | 4096      | ~50,000,000        |
+
+Key settings for observing double descent:
+- **No dropout** (dropout=0) to avoid smoothing out the interpolation peak
+- **Label noise** (15%) to make the peak more pronounced
+- **Smaller training subset** (10k samples) to hit interpolation threshold faster
 
 ## Expected Results
 
-### Model-wise Double Descent
+### Width-Sweep Double Descent (Model-wise)
 
-According to Belkin's theory, we expect test error to:
+According to Belkin/Nakkiran's theory, we expect test error to:
 
-1. Decrease initially (underparameterized regime)
-2. Potentially increase near interpolation threshold
-3. Decrease again (overparameterized regime)
+1. Decrease initially (underparameterized regime, small widths)
+2. **Peak** near the interpolation threshold (where model can just fit training data)
+3. Decrease again (overparameterized regime, large widths)
 
 ### Epoch-wise Double Descent
 
-We expect test error to:
+With a model that can interpolate training data, we expect:
 
 1. Improve during initial training
-2. Plateau or slightly degrade (overfitting)
-3. Potentially recover with continued training
+2. Degrade as model overfits (approaches interpolation)
+3. Potentially recover with continued training past interpolation
 
-**Note**: CIFAR-10 may not exhibit strong double descent due to dataset characteristics. Negative results are still scientifically valuable!
+**Note**: CIFAR-10 may not exhibit strong double descent. Negative results are still scientifically valuable!
 
 ## Hardware Requirements
 
@@ -141,8 +146,8 @@ We expect test error to:
 
 After running experiments, results will be saved to:
 
-- `results/model_wise/all_results.pkl` - Model-wise results
-- `results/epoch_wise/*.pkl` - Epoch-wise results
+- `results/width_sweep/all_results.pkl` - Width-sweep DD results
+- `results/epoch_wise/*.pkl` - Epoch-wise DD results
 - `report/figures/*.pdf` - Publication-ready figures
 
 ## Compiling the Report

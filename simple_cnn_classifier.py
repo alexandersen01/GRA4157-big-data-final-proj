@@ -182,19 +182,27 @@ class CNNClassifier:
 
         return self.history
 
-    def predict(self, X):
+    def predict(self, X, batch_size=128):
         if self.model is None:
             raise ValueError("fit must be called before calling predict")
 
         channels, height, width = self.input_shape
-        X_tensor = (
-            torch.FloatTensor(X).view(-1, channels, height, width).to(self.device)
-        )
+        X_tensor = torch.FloatTensor(X).view(-1, channels, height, width)
+        
+        # Batched prediction to avoid OOM on large datasets/models
+        dataset = TensorDataset(X_tensor)
+        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+        
         self.model.eval()
+        all_preds = []
         with torch.no_grad():
-            outputs = self.model(X_tensor)
-        _, predicted = torch.max(outputs.data, 1)
-        return predicted.cpu().numpy()
+            for (X_batch,) in dataloader:
+                X_batch = X_batch.to(self.device)
+                outputs = self.model(X_batch)
+                _, predicted = torch.max(outputs, 1)
+                all_preds.append(predicted.cpu().numpy())
+        
+        return np.concatenate(all_preds)
 
     def get_params(self, deep: bool = True) -> dict[str, Any]:
         return {

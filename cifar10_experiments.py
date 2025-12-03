@@ -12,11 +12,6 @@ import time
 from datetime import datetime
 
 from flexible_cnn_classifier import (
-    create_baseline_model,
-    create_medium_model,
-    create_high_model,
-    create_very_high_model,
-    create_extreme_model,
     create_width_scaled_model,
     get_width_multipliers_for_double_descent,
 )
@@ -99,112 +94,6 @@ def get_class_names():  # returns cifar class names
         "ship",
         "truck",
     ]
-
-
-# MODEL WISE DD
-
-
-def run_model_wise_experiment(
-    X_train,
-    X_val,
-    X_test,
-    y_train,
-    y_val,
-    y_test,
-    num_epochs=100,
-    learning_rate=0.001,
-    results_dir="results/model_wise",
-    seed=42,
-):
-    """
-    train models of varying complexity to observe model-wise double descent
-
-    expected: test error shows U-shape then recovery as model complexity increases
-    """
-    print("model-wise DD experiment")
-
-    Path(results_dir).mkdir(parents=True, exist_ok=True)
-
-    # define model configurations
-    model_configs = {
-        "Baseline": create_baseline_model,
-        "Medium": create_medium_model,
-        "High": create_high_model,
-        "Very High": create_very_high_model,
-        "Extreme": create_extreme_model,
-    }
-
-    results = {}
-
-    for model_name, model_fn in model_configs.items():
-        print(f"Training {model_name} Model")
-
-        start_time = time.time()
-
-        # create model
-        model = model_fn(in_channels=3, num_classes=10, seed=seed)
-        arch_summary = model.get_architecture_summary()
-        print(f"params: {arch_summary['total_parameters']:,}")
-
-        # create classifier
-        classifier = CNNClassifier(
-            learning_rate=learning_rate,
-            num_epochs=num_epochs,
-            model=model,
-            input_shape=(3, 32, 32),
-            seed=seed,
-        )
-
-        # train with tracking
-        history = classifier.fit_with_tracking(
-            X_train, y_train, X_val, y_val, batch_size=128, verbose=True
-        )
-
-        # evaluate on test set
-        y_pred = classifier.predict(X_test)
-        test_accuracy = accuracy_score(y_test, y_pred)
-        test_f1 = f1_score(y_test, y_pred, average="weighted")
-
-        training_time = time.time() - start_time
-
-        print(f"\ntest Set Performance:")
-        print(f"  accuracy: {test_accuracy:.4f}")
-        print(f"  F1 Score: {test_f1:.4f}")
-        print(f"  training Time: {training_time:.1f}s")
-
-        # store results
-        results[model_name] = {
-            "model_name": model_name,
-            "architecture": arch_summary,
-            "history": history,
-            "test_accuracy": test_accuracy,
-            "test_f1": test_f1,
-            "test_error": 1 - test_accuracy,
-            "training_time": training_time,
-            "y_pred": y_pred,
-        }
-
-        # save checkpoint
-        checkpoint_path = (
-            Path(results_dir) / f"{model_name.lower().replace(' ', '_')}_checkpoint.pkl"
-        )
-        with open(checkpoint_path, "wb") as f:
-            pickle.dump(results[model_name], f)
-        print(f"saved checkpoint to {checkpoint_path}")
-
-        # explicitly free GPU memory before moving on to the next model
-        if torch.cuda.is_available():
-            del classifier
-            del model
-            torch.cuda.empty_cache()
-
-    # save consolidated results
-    results_path = Path(results_dir) / "all_results.pkl"
-    with open(results_path, "wb") as f:
-        pickle.dump(results, f)
-    print(f"\nsaved all results to {results_path}")
-
-    return results
 
 
 # WIDTH-SWEEP DD (like ResNet18 width in the paper)
@@ -347,7 +236,7 @@ def run_width_sweep_experiment(
 def plot_width_sweep_double_descent(
     results, save_path="report/figures/width_sweep_double_descent.pdf"
 ):
-    """Plot test/train error vs model width (like the image you showed)"""
+    """Plot test/train error vs model width (Nakkiran et al. style)"""
     Path(save_path).parent.mkdir(parents=True, exist_ok=True)
 
     # Extract data
@@ -362,77 +251,118 @@ def plot_width_sweep_double_descent(
         train_errors.append(result["train_error"])
         test_errors.append(result["test_error"])
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-
-    # Plot 1: Error vs Width (like your image)
-    ax1.plot(
+    # Set dark style like the reference image
+    plt.style.use("dark_background")
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot test error with confidence band effect
+    ax.plot(
         widths,
         test_errors,
-        "o-",
-        linewidth=2,
-        markersize=6,
-        color="steelblue",
-        label="Test Error",
+        "-",
+        linewidth=2.5,
+        color="#6A5ACD",  # Slate blue like the reference
+        label="Reality",
+        zorder=3,
     )
-    ax1.plot(
-        widths,
-        train_errors,
-        "o--",
-        linewidth=2,
-        markersize=6,
-        color="coral",
-        alpha=0.7,
-        label="Train Error",
+    ax.fill_between(
+        widths, 
+        [e - 0.01 for e in test_errors], 
+        [e + 0.01 for e in test_errors], 
+        alpha=0.3, 
+        color="#6A5ACD",
+        zorder=2,
     )
-    ax1.fill_between(widths, test_errors, alpha=0.2, color="steelblue")
-    ax1.set_xlabel("Model Width Multiplier", fontsize=12, fontweight="bold")
-    ax1.set_ylabel("Error", fontsize=12, fontweight="bold")
-    ax1.set_title(
-        "Double Descent: Error vs Model Width", fontsize=14, fontweight="bold"
+    
+    # Find the peak (interpolation threshold)
+    peak_idx = np.argmax(test_errors)
+    peak_width = widths[peak_idx]
+    peak_error = test_errors[peak_idx]
+    
+    # Add "Expected" annotation lines (like the reference)
+    # Modern ML expectation (monotonic decrease)
+    ax.annotate(
+        "Expected\n(Modern ML)",
+        xy=(2, test_errors[1] + 0.02),
+        xytext=(3, 0.65),
+        fontsize=10,
+        color="#FFA500",  # Orange
+        ha="center",
+        arrowprops=dict(arrowstyle="->", color="#FFA500", lw=1.5),
     )
-    ax1.legend(fontsize=10)
-    ax1.grid(True, alpha=0.3)
-
-    # Mark interpolation threshold region
-    ax1.axvline(
-        x=widths[np.argmax(test_errors)],
-        color="red",
-        linestyle=":",
-        alpha=0.5,
-        label="Interpolation Threshold",
+    
+    # Classical statistics expectation (U-shape, keeps going up)
+    ax.annotate(
+        "Expected\n(Classical Statistics)",
+        xy=(peak_width, peak_error + 0.02),
+        xytext=(15, 0.65),
+        fontsize=10,
+        color="#32CD32",  # Lime green
+        ha="center",
+        arrowprops=dict(arrowstyle="->", color="#32CD32", lw=1.5),
     )
-
-    # Plot 2: Error vs Parameters (log scale)
-    ax2.plot(
-        params,
-        test_errors,
-        "o-",
-        linewidth=2,
-        markersize=6,
-        color="steelblue",
-        label="Test Error",
+    
+    # Add "Reality" label near the curve
+    mid_idx = len(widths) // 3
+    ax.annotate(
+        "Reality",
+        xy=(widths[mid_idx], test_errors[mid_idx]),
+        xytext=(widths[mid_idx] - 5, test_errors[mid_idx] - 0.05),
+        fontsize=11,
+        color="#6A5ACD",
+        fontweight="bold",
     )
-    ax2.plot(
-        params,
-        train_errors,
-        "o--",
-        linewidth=2,
-        markersize=6,
-        color="coral",
-        alpha=0.7,
-        label="Train Error",
-    )
-    ax2.set_xscale("log")
-    ax2.set_xlabel("Number of Parameters", fontsize=12, fontweight="bold")
-    ax2.set_ylabel("Error", fontsize=12, fontweight="bold")
-    ax2.set_title("Double Descent: Error vs Parameters", fontsize=14, fontweight="bold")
-    ax2.legend(fontsize=10)
-    ax2.grid(True, alpha=0.3)
+    
+    # Axis styling
+    ax.set_xlabel("Model Size (Width Multiplier)", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Test / Train Error", fontsize=12, fontweight="bold")
+    ax.set_xlim(0, max(widths) + 2)
+    ax.set_ylim(0.2, 0.75)
+    
+    # Grid
+    ax.grid(True, alpha=0.2, linestyle="-")
+    ax.set_axisbelow(True)
+    
+    # Tick styling
+    ax.tick_params(colors="white", labelsize=10)
+    for spine in ax.spines.values():
+        spine.set_color("white")
+        spine.set_alpha(0.3)
 
     plt.tight_layout()
-    plt.savefig(save_path, bbox_inches="tight", dpi=300)
+    plt.savefig(save_path, bbox_inches="tight", dpi=300, facecolor="#1a1a2e")
     print(f"Saved figure to {save_path}")
     plt.close()
+    
+    # Reset style for other plots
+    plt.style.use("default")
+    
+    # Also save a second version with both train and test error
+    plt.style.use("dark_background")
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    
+    ax2.plot(widths, test_errors, "-", linewidth=2.5, color="#6A5ACD", label="Test Error")
+    ax2.plot(widths, train_errors, "--", linewidth=2, color="#FF6B6B", alpha=0.8, label="Train Error")
+    ax2.fill_between(widths, test_errors, alpha=0.2, color="#6A5ACD")
+    
+    ax2.axvline(x=peak_width, color="#FFD700", linestyle=":", alpha=0.5, 
+                label=f"Interpolation Threshold (k={peak_width})")
+    
+    ax2.set_xlabel("Model Size (Width Multiplier)", fontsize=12, fontweight="bold")
+    ax2.set_ylabel("Error", fontsize=12, fontweight="bold")
+    ax2.set_title("Double Descent: Width Sweep Experiment", fontsize=14, fontweight="bold", color="white")
+    ax2.legend(fontsize=10, loc="upper right")
+    ax2.grid(True, alpha=0.2)
+    ax2.set_xlim(0, max(widths) + 2)
+    
+    plt.tight_layout()
+    save_path2 = save_path.replace(".pdf", "_detailed.pdf")
+    plt.savefig(save_path2, bbox_inches="tight", dpi=300, facecolor="#1a1a2e")
+    print(f"Saved detailed figure to {save_path2}")
+    plt.close()
+    
+    plt.style.use("default")
 
 
 # EPOCH WISE DD
@@ -445,7 +375,7 @@ def run_epoch_wise_experiment(
     y_train,
     y_val,
     y_test,
-    model_name="Baseline",
+    width_multiplier=20,
     num_epochs=400,
     learning_rate=0.001,
     results_dir="results/epoch_wise",
@@ -454,30 +384,32 @@ def run_epoch_wise_experiment(
     seed=42,
 ):
     """
-    train a model for many epochs to observe epoch-wise double descent
+    Train a model for many epochs to observe epoch-wise double descent.
 
-    expected: test error improves, degrades, then hopefully recovers
+    Uses width-scaled model (no dropout) that can interpolate training data.
+    Expected: test error improves, degrades at interpolation, then recovers.
+
+    Args:
+        width_multiplier: Width scaling factor for model (higher = more params).
+                         Use ~20 for a model that can interpolate ~10k samples.
     """
     print("epoch-wise DD")
 
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
 
+    model_name = f"width_{width_multiplier}"
+
     # default checkpoint path (one rolling checkpoint per model)
     if checkpoint_path is None:
-        checkpoint_path = results_dir / f"{model_name.lower()}_epochwise_checkpoint.pkl"
+        checkpoint_path = results_dir / f"{model_name}_epochwise_checkpoint.pkl"
     else:
         checkpoint_path = Path(checkpoint_path)
 
-    # select model
-    model_creators = {
-        "Baseline": create_baseline_model,
-        "Medium": create_medium_model,
-        "High": create_high_model,
-    }
-
-    # build model
-    model = model_creators[model_name](in_channels=3, num_classes=10, seed=seed)
+    # build width-scaled model (no dropout for epoch-wise DD)
+    model = create_width_scaled_model(
+        width_multiplier=width_multiplier, in_channels=3, num_classes=10, seed=seed
+    )
 
     # load from checkpoint if provided
     start_epoch = 0
@@ -578,75 +510,6 @@ def run_epoch_wise_experiment(
 
 
 # VIZ UTILS
-def plot_model_wise_double_descent(
-    results, save_path="report/figures/model_wise_double_descent.pdf"
-):
-    """plot test error vs model complexity"""
-    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
-
-    # extract data
-    model_names = []
-    params = []
-    test_errors = []
-    test_f1_scores = []
-
-    for name, result in results.items():
-        model_names.append(name)
-        params.append(result["architecture"]["total_parameters"])
-        test_errors.append(result["test_error"])
-        test_f1_scores.append(result["test_f1"])
-
-    # create figure with two subplots
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-
-    # plot 1: test error vs parameters
-    ax1.plot(params, test_errors, "o-", linewidth=2, markersize=8, color="steelblue")
-    ax1.set_xscale("log")
-    ax1.set_xlabel("Number of Parameters", fontsize=12, fontweight="bold")
-    ax1.set_ylabel("Test Error", fontsize=12, fontweight="bold")
-    ax1.set_title(
-        "Model-wise Double Descent: Test Error", fontsize=14, fontweight="bold"
-    )
-    ax1.grid(True, alpha=0.3)
-
-    # add model labels
-    for i, name in enumerate(model_names):
-        ax1.annotate(
-            name,
-            (params[i], test_errors[i]),
-            textcoords="offset points",
-            xytext=(0, 10),
-            ha="center",
-            fontsize=9,
-        )
-
-    # plot 2: F1 Score vs parameters
-    ax2.plot(
-        params, test_f1_scores, "o-", linewidth=2, markersize=8, color="darkorange"
-    )
-    ax2.set_xscale("log")
-    ax2.set_xlabel("Number of Parameters", fontsize=12, fontweight="bold")
-    ax2.set_ylabel("Test F1 Score", fontsize=12, fontweight="bold")
-    ax2.set_title("Model-wise: Test F1 Score", fontsize=14, fontweight="bold")
-    ax2.grid(True, alpha=0.3)
-
-    # add model labels
-    for i, name in enumerate(model_names):
-        ax2.annotate(
-            name,
-            (params[i], test_f1_scores[i]),
-            textcoords="offset points",
-            xytext=(0, 10),
-            ha="center",
-            fontsize=9,
-        )
-
-    plt.tight_layout()
-    plt.savefig(save_path, bbox_inches="tight", dpi=300)
-    print(f"Saved figure to {save_path}")
-    plt.close()
-
-
 def plot_epoch_wise_double_descent(
     results, save_path="report/figures/epoch_wise_double_descent.pdf"
 ):
@@ -743,47 +606,48 @@ def plot_confusion_matrix(
 
 
 def create_results_summary_table(results, save_path="report/figures/results_table.txt"):
-    """Create a formatted table of results"""
+    """Create a formatted table of results for width-sweep experiment"""
     Path(save_path).parent.mkdir(parents=True, exist_ok=True)
 
     with open(save_path, "w") as f:
-        f.write("=" * 100 + "\n")
-        f.write("model-wise DD results summary\n")
-        f.write("=" * 100 + "\n\n")
+        f.write("=" * 110 + "\n")
+        f.write("Width-Sweep Double Descent Results Summary\n")
+        f.write("=" * 110 + "\n\n")
 
         # header
         f.write(
-            f"{'model':<15} {'params':<15} {'test Acc':<12} {'test F1':<12} {'test error':<12} {'time (s)':<10}\n"
+            f"{'Width':<10} {'Params':<15} {'Train Acc':<12} {'Test Acc':<12} {'Test F1':<12} {'Test Error':<12} {'Time (s)':<10}\n"
         )
-        f.write("-" * 100 + "\n")
+        f.write("-" * 110 + "\n")
 
-        # data rows
-        for name, result in results.items():
+        # data rows (sorted by width)
+        for width, result in sorted(results.items()):
             params = result["architecture"]["total_parameters"]
+            train_acc = result.get("train_accuracy", 0)
             acc = result["test_accuracy"]
             f1 = result["test_f1"]
             error = result["test_error"]
             time_s = result["training_time"]
 
             f.write(
-                f"{name:<15} {params:<15,} {acc:<12.4f} {f1:<12.4f} {error:<12.4f} {time_s:<10.1f}\n"
+                f"{width:<10} {params:<15,} {train_acc:<12.4f} {acc:<12.4f} {f1:<12.4f} {error:<12.4f} {time_s:<10.1f}\n"
             )
 
-        f.write("=" * 100 + "\n")
+        f.write("=" * 110 + "\n")
 
     print(f"saved results table to {save_path}")
 
 
 def main(seed=42):
 
-    MODEL_WISE_NUM_EPOCHS = 0  # Set to 0 to load cached results
+    WIDTH_SWEEP_NUM_EPOCHS = 200  # Set to 0 to load cached results
     EPOCH_WISE_NUM_EPOCHS = 0  # Set to 0 to load cached results
 
     # Paths for cached results
-    model_wise_cache = Path("results/model_wise/all_results.pkl")
+    width_sweep_cache = Path("results/width_sweep/all_results.pkl")
     epoch_wise_cache = Path("results/epoch_wise/baseline_epochs_30000_results.pkl")
 
-    # load data (needed for confusion matrix y_test)
+    # load data
     X_train, X_val, X_test, y_train, y_val, y_test = load_cifar10(seed=seed)
     class_names = get_class_names()
 
@@ -797,42 +661,37 @@ def main(seed=42):
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}")
 
-    # MODEL-WISE EXPERIMENT
-    print("model-wise DD")
-    if MODEL_WISE_NUM_EPOCHS == 0 and model_wise_cache.exists():
-        print(f"Loading cached model-wise results from {model_wise_cache}")
-        with open(model_wise_cache, "rb") as f:
-            model_wise_results = pickle.load(f)
+    # WIDTH-SWEEP EXPERIMENT (Model-wise Double Descent)
+    print("\n" + "=" * 60)
+    print("WIDTH-SWEEP DOUBLE DESCENT")
+    print("=" * 60)
+    if WIDTH_SWEEP_NUM_EPOCHS == 0 and width_sweep_cache.exists():
+        print(f"Loading cached width-sweep results from {width_sweep_cache}")
+        with open(width_sweep_cache, "rb") as f:
+            width_sweep_results = pickle.load(f)
     else:
-        model_wise_results = run_model_wise_experiment(
+        width_sweep_results = run_width_sweep_experiment(
             X_train,
             X_val,
             X_test,
             y_train,
             y_val,
             y_test,
-            num_epochs=MODEL_WISE_NUM_EPOCHS,
+            num_epochs=WIDTH_SWEEP_NUM_EPOCHS,
+            label_noise=0.15,  # Add label noise to make double descent peak more visible
+            train_subset_size=10000,  # Smaller subset to hit interpolation faster
             learning_rate=0.001,
             seed=seed,
         )
 
-    # generate model-wise visualizations
-    plot_model_wise_double_descent(model_wise_results)
-    create_results_summary_table(model_wise_results)
-
-    # plot confusion matrix for best model
-    best_model_name = max(
-        model_wise_results.keys(), key=lambda k: model_wise_results[k]["test_f1"]
-    )
-    plot_confusion_matrix(
-        y_test,
-        model_wise_results[best_model_name]["y_pred"],
-        class_names,
-        save_path=f'report/figures/confusion_matrix_{best_model_name.lower().replace(" ", "_")}.pdf',
-    )
+    # generate width-sweep vis
+    plot_width_sweep_double_descent(width_sweep_results)
+    create_results_summary_table(width_sweep_results, save_path="report/figures/width_sweep_results.txt")
 
     # EPOCH-WISE EXPERIMENT
-    print("epoch-wise DD")
+    print("\n" + "=" * 60)
+    print("EPOCH-WISE DOUBLE DESCENT")
+    print("=" * 60)
     if EPOCH_WISE_NUM_EPOCHS == 0 and epoch_wise_cache.exists():
         print(f"Loading cached epoch-wise results from {epoch_wise_cache}")
         with open(epoch_wise_cache, "rb") as f:
@@ -845,7 +704,7 @@ def main(seed=42):
             y_train,
             y_val,
             y_test,
-            model_name="Baseline",
+            width_multiplier=20,  # Larger model that can interpolate training data
             num_epochs=EPOCH_WISE_NUM_EPOCHS,
             learning_rate=0.001,
             seed=seed,

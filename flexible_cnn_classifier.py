@@ -181,13 +181,21 @@ def get_width_multipliers_for_double_descent():
     """
     Returns width multipliers that span the interpolation threshold.
 
-    For CIFAR-10 with ~35k training samples and typical CNN:
+    For CIFAR-10 with ~10k training samples (subset) and typical CNN:
     - Small widths (1-5): underparameterized regime
     - Medium widths (6-15): around interpolation threshold (peak error)
-    - Large widths (16-64): overparameterized regime
+    - Large widths (16-128): overparameterized regime (where DD recovery happens)
+
+    Note: Using smaller training subset (10k) makes interpolation threshold 
+    easier to hit and the peak more pronounced.
     """
     # Fine-grained sampling around expected interpolation threshold
-    widths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64]
+    # Extended to 128 to ensure we're well into overparameterized regime
+    widths = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,  # underparameterized
+        12, 14, 16, 18, 20,              # around interpolation threshold
+        24, 32, 40, 48, 64, 80, 96, 128  # overparameterized
+    ]
     return widths
 
 
