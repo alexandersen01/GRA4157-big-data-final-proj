@@ -150,6 +150,47 @@ def create_extreme_model(in_channels=3, num_classes=10, seed=42):
     )
 
 
+def create_width_scaled_model(width_multiplier, in_channels=3, num_classes=10, seed=42):
+    """
+    Create model with width scaled by multiplier (like ResNet18 width in the paper).
+
+    This allows fine-grained control over model capacity for observing double descent.
+    Width multiplier of 1 = baseline, higher = more parameters.
+
+    Key for double descent:
+    - NO dropout (dropout_rate=0.0) to not smooth out the interpolation peak
+    - Width scales base_filters and fc_hidden_dim
+    """
+    base_filters = max(
+        1, int(8 * width_multiplier)
+    )  # Start small to hit interpolation threshold
+    fc_hidden_dim = max(8, int(32 * width_multiplier))
+
+    return FlexibleCNN(
+        in_channels=in_channels,
+        num_conv_blocks=2,  # Keep architecture simple
+        base_filters=base_filters,
+        fc_hidden_dim=fc_hidden_dim,
+        num_classes=num_classes,
+        dropout_rate=0.0,  # NO DROPOUT - critical for seeing double descent peak!
+        seed=seed,
+    )
+
+
+def get_width_multipliers_for_double_descent():
+    """
+    Returns width multipliers that span the interpolation threshold.
+
+    For CIFAR-10 with ~35k training samples and typical CNN:
+    - Small widths (1-5): underparameterized regime
+    - Medium widths (6-15): around interpolation threshold (peak error)
+    - Large widths (16-64): overparameterized regime
+    """
+    # Fine-grained sampling around expected interpolation threshold
+    widths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64]
+    return widths
+
+
 if __name__ == "__main__":
     models = {
         "Baseline": create_baseline_model(),
