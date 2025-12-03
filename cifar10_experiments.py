@@ -10,6 +10,7 @@ from pathlib import Path
 import pickle
 import time
 from datetime import datetime
+import gc
 
 from flexible_cnn_classifier import (
     create_width_scaled_model,
@@ -99,6 +100,17 @@ def get_class_names():  # returns cifar class names
 # WIDTH-SWEEP DD (like ResNet18 width in the paper)
 
 
+def clear_gpu_memory():
+    """Aggressively clear GPU memory to prevent OOM between models."""
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+    elif torch.backends.mps.is_available():
+        # MPS doesn't have empty_cache, but gc.collect helps
+        pass
+
+
 def run_width_sweep_experiment(
     X_train,
     X_val,
@@ -113,6 +125,7 @@ def run_width_sweep_experiment(
     label_noise=0.0,  # Add label noise to make double descent more visible
     train_subset_size=None,  # Use smaller training set for faster interpolation
     seed=42,
+    resume=True,  # Resume from existing checkpoints
 ):
     """
     Train models of varying WIDTH to observe model-wise double descent.
@@ -126,12 +139,15 @@ def run_width_sweep_experiment(
     Args:
         label_noise: Fraction of labels to randomly flip (0.0-0.2 recommended)
         train_subset_size: If set, use only this many training samples
+        resume: If True, skip widths that already have checkpoints with same num_epochs
     """
     print("=" * 60)
     print("WIDTH-SWEEP DOUBLE DESCENT EXPERIMENT")
+    print(f"Training for {num_epochs} epochs per model")
     print("=" * 60)
 
-    Path(results_dir).mkdir(parents=True, exist_ok=True)
+    results_dir = Path(results_dir)
+    results_dir.mkdir(parents=True, exist_ok=True)
 
     if width_multipliers is None:
         width_multipliers = get_width_multipliers_for_double_descent()
@@ -154,11 +170,33 @@ def run_width_sweep_experiment(
         print(f"Added {label_noise*100:.0f}% label noise ({n_noisy} labels)")
 
     results = {}
+    total_widths = len(width_multipliers)
 
-    for width in width_multipliers:
-        print(f"\n{'='*40}")
-        print(f"Training Width Multiplier = {width}")
-        print(f"{'='*40}")
+    for idx, width in enumerate(width_multipliers):
+        print(f"\n{'='*60}")
+        print(f"[{idx+1}/{total_widths}] Training Width Multiplier = {width}")
+        print(f"{'='*60}")
+
+        checkpoint_path = results_dir / f"width_{width}_checkpoint.pkl"
+
+        # Check if we can resume from existing checkpoint
+        if resume and checkpoint_path.exists():
+            with open(checkpoint_path, "rb") as f:
+                existing = pickle.load(f)
+            existing_epochs = len(existing.get("history", {}).get("train_loss", []))
+            if existing_epochs >= num_epochs:
+                print(
+                    f"  Skipping - already trained for {existing_epochs} epochs (>= {num_epochs})"
+                )
+                results[width] = existing
+                continue
+            else:
+                print(
+                    f"  Found checkpoint with {existing_epochs} epochs, retraining for {num_epochs}..."
+                )
+
+        # Clear GPU memory before creating new model
+        clear_gpu_memory()
 
         start_time = time.time()
 
@@ -167,7 +205,12 @@ def run_width_sweep_experiment(
             width_multiplier=width, in_channels=3, num_classes=10, seed=seed
         )
         arch_summary = model.get_architecture_summary()
-        print(f"Parameters: {arch_summary['total_parameters']:,}")
+        print(f"  Parameters: {arch_summary['total_parameters']:,}")
+
+        # Estimate time
+        estimated_time_per_epoch = 0.18 + (width * 0.01)  # rough estimate
+        estimated_total = estimated_time_per_epoch * num_epochs / 60
+        print(f"  Estimated time: ~{estimated_total:.0f} minutes")
 
         # Create classifier
         classifier = CNNClassifier(
@@ -194,10 +237,12 @@ def run_width_sweep_experiment(
 
         training_time = time.time() - start_time
 
-        print(f"\nResults:")
-        print(f"  Train Accuracy: {train_accuracy:.4f} (error: {1-train_accuracy:.4f})")
-        print(f"  Test Accuracy: {test_accuracy:.4f} (error: {1-test_accuracy:.4f})")
-        print(f"  Training Time: {training_time:.1f}s")
+        print(f"\n  Results:")
+        print(
+            f"    Train Accuracy: {train_accuracy:.4f} (error: {1-train_accuracy:.4f})"
+        )
+        print(f"    Test Accuracy: {test_accuracy:.4f} (error: {1-test_accuracy:.4f})")
+        print(f"    Training Time: {training_time:.1f}s ({training_time/60:.1f} min)")
 
         # Store results
         results[width] = {
@@ -210,22 +255,25 @@ def run_width_sweep_experiment(
             "test_f1": test_f1,
             "test_error": 1 - test_accuracy,
             "training_time": training_time,
+            "num_epochs": num_epochs,
             "y_pred": y_pred,
         }
 
-        # Save checkpoint
-        checkpoint_path = Path(results_dir) / f"width_{width}_checkpoint.pkl"
+        # Save checkpoint immediately after each model
         with open(checkpoint_path, "wb") as f:
             pickle.dump(results[width], f)
+        print(f"  Saved checkpoint to {checkpoint_path}")
 
-        # Free GPU memory
-        if torch.cuda.is_available():
-            del classifier
-            del model
-            torch.cuda.empty_cache()
+        # Aggressively free GPU memory
+        del classifier.model
+        del classifier
+        del model
+        del y_pred
+        del y_train_pred
+        clear_gpu_memory()
 
     # Save consolidated results
-    results_path = Path(results_dir) / "all_results.pkl"
+    results_path = results_dir / "all_results.pkl"
     with open(results_path, "wb") as f:
         pickle.dump(results, f)
     print(f"\nSaved all results to {results_path}")
@@ -253,9 +301,9 @@ def plot_width_sweep_double_descent(
 
     # Set dark style like the reference image
     plt.style.use("dark_background")
-    
+
     fig, ax = plt.subplots(figsize=(10, 6))
-    
+
     # Plot test error with confidence band effect
     ax.plot(
         widths,
@@ -267,19 +315,19 @@ def plot_width_sweep_double_descent(
         zorder=3,
     )
     ax.fill_between(
-        widths, 
-        [e - 0.01 for e in test_errors], 
-        [e + 0.01 for e in test_errors], 
-        alpha=0.3, 
+        widths,
+        [e - 0.01 for e in test_errors],
+        [e + 0.01 for e in test_errors],
+        alpha=0.3,
         color="#6A5ACD",
         zorder=2,
     )
-    
+
     # Find the peak (interpolation threshold)
     peak_idx = np.argmax(test_errors)
     peak_width = widths[peak_idx]
     peak_error = test_errors[peak_idx]
-    
+
     # Add "Expected" annotation lines (like the reference)
     # Modern ML expectation (monotonic decrease)
     ax.annotate(
@@ -291,7 +339,7 @@ def plot_width_sweep_double_descent(
         ha="center",
         arrowprops=dict(arrowstyle="->", color="#FFA500", lw=1.5),
     )
-    
+
     # Classical statistics expectation (U-shape, keeps going up)
     ax.annotate(
         "Expected\n(Classical Statistics)",
@@ -302,7 +350,7 @@ def plot_width_sweep_double_descent(
         ha="center",
         arrowprops=dict(arrowstyle="->", color="#32CD32", lw=1.5),
     )
-    
+
     # Add "Reality" label near the curve
     mid_idx = len(widths) // 3
     ax.annotate(
@@ -313,17 +361,17 @@ def plot_width_sweep_double_descent(
         color="#6A5ACD",
         fontweight="bold",
     )
-    
+
     # Axis styling
     ax.set_xlabel("Model Size (Width Multiplier)", fontsize=12, fontweight="bold")
     ax.set_ylabel("Test / Train Error", fontsize=12, fontweight="bold")
     ax.set_xlim(0, max(widths) + 2)
     ax.set_ylim(0.2, 0.75)
-    
+
     # Grid
     ax.grid(True, alpha=0.2, linestyle="-")
     ax.set_axisbelow(True)
-    
+
     # Tick styling
     ax.tick_params(colors="white", labelsize=10)
     for spine in ax.spines.values():
@@ -334,34 +382,54 @@ def plot_width_sweep_double_descent(
     plt.savefig(save_path, bbox_inches="tight", dpi=300, facecolor="#1a1a2e")
     print(f"Saved figure to {save_path}")
     plt.close()
-    
+
     # Reset style for other plots
     plt.style.use("default")
-    
+
     # Also save a second version with both train and test error
     plt.style.use("dark_background")
     fig2, ax2 = plt.subplots(figsize=(10, 6))
-    
-    ax2.plot(widths, test_errors, "-", linewidth=2.5, color="#6A5ACD", label="Test Error")
-    ax2.plot(widths, train_errors, "--", linewidth=2, color="#FF6B6B", alpha=0.8, label="Train Error")
+
+    ax2.plot(
+        widths, test_errors, "-", linewidth=2.5, color="#6A5ACD", label="Test Error"
+    )
+    ax2.plot(
+        widths,
+        train_errors,
+        "--",
+        linewidth=2,
+        color="#FF6B6B",
+        alpha=0.8,
+        label="Train Error",
+    )
     ax2.fill_between(widths, test_errors, alpha=0.2, color="#6A5ACD")
-    
-    ax2.axvline(x=peak_width, color="#FFD700", linestyle=":", alpha=0.5, 
-                label=f"Interpolation Threshold (k={peak_width})")
-    
+
+    ax2.axvline(
+        x=peak_width,
+        color="#FFD700",
+        linestyle=":",
+        alpha=0.5,
+        label=f"Interpolation Threshold (k={peak_width})",
+    )
+
     ax2.set_xlabel("Model Size (Width Multiplier)", fontsize=12, fontweight="bold")
     ax2.set_ylabel("Error", fontsize=12, fontweight="bold")
-    ax2.set_title("Double Descent: Width Sweep Experiment", fontsize=14, fontweight="bold", color="white")
+    ax2.set_title(
+        "Double Descent: Width Sweep Experiment",
+        fontsize=14,
+        fontweight="bold",
+        color="white",
+    )
     ax2.legend(fontsize=10, loc="upper right")
     ax2.grid(True, alpha=0.2)
     ax2.set_xlim(0, max(widths) + 2)
-    
+
     plt.tight_layout()
     save_path2 = save_path.replace(".pdf", "_detailed.pdf")
     plt.savefig(save_path2, bbox_inches="tight", dpi=300, facecolor="#1a1a2e")
     print(f"Saved detailed figure to {save_path2}")
     plt.close()
-    
+
     plt.style.use("default")
 
 
@@ -640,11 +708,12 @@ def create_results_summary_table(results, save_path="report/figures/results_tabl
 
 def main(seed=42):
 
-    WIDTH_SWEEP_NUM_EPOCHS = 200  # Set to 0 to load cached results
+    WIDTH_SWEEP_NUM_EPOCHS = 4000  # 4000 epochs for double descent (like the paper)
     EPOCH_WISE_NUM_EPOCHS = 0  # Set to 0 to load cached results
 
-    # Paths for cached results
-    width_sweep_cache = Path("results/width_sweep/all_results.pkl")
+    # Paths for cached results - use new directory for 4000 epoch run
+    results_dir = "results/width_sweep_4000"
+    width_sweep_cache = Path(f"{results_dir}/all_results.pkl")
     epoch_wise_cache = Path("results/epoch_wise/baseline_epochs_30000_results.pkl")
 
     # load data
@@ -660,10 +729,13 @@ def main(seed=42):
     print(f"\nUsing device: {device}")
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}")
+        print(
+            f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB"
+        )
 
     # WIDTH-SWEEP EXPERIMENT (Model-wise Double Descent)
     print("\n" + "=" * 60)
-    print("WIDTH-SWEEP DOUBLE DESCENT")
+    print("WIDTH-SWEEP DOUBLE DESCENT (4000 EPOCHS)")
     print("=" * 60)
     if WIDTH_SWEEP_NUM_EPOCHS == 0 and width_sweep_cache.exists():
         print(f"Loading cached width-sweep results from {width_sweep_cache}")
@@ -678,15 +750,22 @@ def main(seed=42):
             y_val,
             y_test,
             num_epochs=WIDTH_SWEEP_NUM_EPOCHS,
+            results_dir=results_dir,
             label_noise=0.15,  # Add label noise to make double descent peak more visible
             train_subset_size=10000,  # Smaller subset to hit interpolation faster
             learning_rate=0.001,
             seed=seed,
+            resume=True,  # Resume from checkpoints if interrupted
         )
 
     # generate width-sweep vis
-    plot_width_sweep_double_descent(width_sweep_results)
-    create_results_summary_table(width_sweep_results, save_path="report/figures/width_sweep_results.txt")
+    plot_width_sweep_double_descent(
+        width_sweep_results,
+        save_path="report/figures/width_sweep_double_descent_4000.pdf",
+    )
+    create_results_summary_table(
+        width_sweep_results, save_path="report/figures/width_sweep_results_4000.txt"
+    )
 
     # EPOCH-WISE EXPERIMENT
     print("\n" + "=" * 60)
