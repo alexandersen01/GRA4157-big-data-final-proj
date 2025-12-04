@@ -5,7 +5,7 @@
 \usepackage{listings}
 \usepackage{times}
 \usepackage{textcomp}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{float}
 \usepackage{parskip}
 \usepackage{minted}
@@ -23,7 +23,7 @@
 %   \thanks{This script is so incredibly baller omd} \\
 %   FSN Labs \\
 \\[1em]
-  \href{mailto:ja.al@fsncapital.com}{\texttt{ja.al@fsncapital.com}} \\[1em]
+  % \href{mailto:ja.al@fsncapital.com}{\texttt{ja.al@fsncapital.com}} \\[1em]
 }
 
 \date{\today}
@@ -46,7 +46,7 @@
 
 \section{Introduction}
 
-Click me \href{https://github.com/alexandersen01/GRA4157-big-data-final-proj}{\faGithub} to view the full code on Github!
+Click me \href{https://github.com/alexandersen01/GRA4157-big-data-final-proj}{\faGithub} to view the full code on Github! \\ (https://github.com/alexandersen01/GRA4157-big-data-final-proj if the clickable icon somehow breaks)
 
 \noindent\rule{\textwidth}{0.4pt}
 
@@ -107,6 +107,8 @@ This scaling approach differs fundamentally from the simple CNN's fixed architec
 Another difference is the removal of dropout regularization. The simple CNN applies 25\% dropout on its fully connected layer to prevent overfitting and improve generalization. However, for observing double descent, dropout is set to zero in the FlexibleCNN. Regularization techniques like dropout smooth out the sharp transition at the interpolation threshold, which is the point where the model has just barely enough capacity to perfectly fit the training data. By removing this regularization, the characteristic peak in test error at the interpolation threshold becomes visible, allowing empirical observation of the double descent phenomenon.
 
 The input dimensions also change to accomodate CIFAR-10's $32\times 32 $ color images compared to MNIST's $28 \times 28 $ grayscale images. After two convolutional blocks with max pooling, the spatial dimensions reduce to $8\times 8 $ (rather than $7\times 7 $ in the simple CNN), resulting in a flattened size of 1024k values before the fully connected layers. This larger input combined with the scaled layer widths allows the model to handle the increased complexity of natural color images while providing the fine-grained control over model capacity necessary for probing different regimes of the bias-variance-capacity landscape.
+
+\newpage
 
 \subsection{Design Choices}
 

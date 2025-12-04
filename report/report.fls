@@ -192,10 +192,6 @@ INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/i
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmsy8.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/cm/cmsy6.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmb7t.tfm
-INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
-INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
-INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
-INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/courier/pcrr7t.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr7t.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmb7t.tfm
 INPUT ./report.toc
@@ -208,8 +204,6 @@ INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/i
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmb7t.vf
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmb8r.tfm
-INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/courier/pcrr7t.vf
-INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/courier/pcrr8r.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmr7t.vf
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmr8r.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/vf/adobe/times/ptmb7t.vf
@@ -222,6 +216,9 @@ INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/i
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/fontawesome/ufontawesometwo.fd
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/fontawesome/ufontawesometwo.fd
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/fontawesome/FontAwesome--fontawesometwo.tfm
+INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
+INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
+INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/courier/pcrr7t.tfm
 INPUT /Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/adobe/times/ptmri7t.tfm
 INPUT ./figures/image.png

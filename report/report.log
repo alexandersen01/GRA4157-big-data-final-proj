@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.4.13)  4 DEC 2025 13:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.4.13)  4 DEC 2025 13:49
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -417,10 +417,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 34.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 34.
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 34.
- (/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) (report.toc
+ (report.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 3.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -438,7 +435,11 @@ LaTeX Font Info:    Trying to load font information for U+fontawesometwo on inpu
  (/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/fontawesome/ufontawesometwo.fd
 File: ufontawesometwo.fd 2016/05/22 Font definitions for U/fontawesometwo.
 )
-<figures/image.png, id=61, 1193.45876pt x 592.2125pt>
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 53.
+ (/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+<figures/image.png, id=59, 1193.45876pt x 592.2125pt>
 File: figures/image.png Graphic file (type png)
 <use figures/image.png>
 Package pdftex.def Info: figures/image.png  used on input line 73.
@@ -446,7 +447,7 @@ Package pdftex.def Info: figures/image.png  used on input line 73.
 
 
 [2]
-<figures/image3.png, id=74, 993.7125pt x 792.9625pt>
+<figures/image3.png, id=73, 993.7125pt x 792.9625pt>
 File: figures/image3.png Graphic file (type png)
 <use figures/image3.png>
 Package pdftex.def Info: figures/image3.png  used on input line 83.
@@ -466,10 +467,10 @@ l.88
       <./figures/image.png> <./figures/image3.png>]
 
 [4]
-<figures/image4.png, id=85, 992.70876pt x 592.2125pt>
+<figures/image4.png, id=84, 992.70876pt x 592.2125pt>
 File: figures/image4.png Graphic file (type png)
 <use figures/image4.png>
-Package pdftex.def Info: figures/image4.png  used on input line 125.
+Package pdftex.def Info: figures/image4.png  used on input line 127.
 (pdftex.def)             Requested size: 362.37569pt x 216.17834pt.
 
 
@@ -477,11 +478,11 @@ Package pdftex.def Info: figures/image4.png  used on input line 125.
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.132 I
-       t is important to note that these experiments were conducted with 200... <./figures/image4.png>] (report.bbl)
+l.133 
+       <./figures/image4.png>] (report.bbl)
 
 [6]
-runsystem(latexminted cleantemp  --timestamp 20251204133055 E98D2F001DA5678B39482EFBDF5770DC)...disabled (restricted).
+runsystem(latexminted cleantemp  --timestamp 20251204134927 E98D2F001DA5678B39482EFBDF5770DC)...disabled (restricted).
 
  (report.aux)
  ***********
@@ -492,17 +493,17 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: 0130719BC129821AABDE851271CF9739;1010.
  ) 
 Here is how much of TeX's memory you used:
- 17141 strings out of 473530
- 326850 string characters out of 5697419
- 835431 words of memory out of 5000000
- 40133 multiletter control sequences out of 15000+600000
- 574743 words of font info for 65 fonts, out of 8000000 for 9000
+ 17139 strings out of 473530
+ 326830 string characters out of 5697419
+ 835384 words of memory out of 5000000
+ 40132 multiletter control sequences out of 15000+600000
+ 574228 words of font info for 63 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,1098b,473s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,6n,79p,1098b,498s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/base/8r.enc}{/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/fontawesome/fontawesometwo.enc}</Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/fontawesome/FontAwesome.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr7.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/courier/ucrr8a.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmb8a.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmr8a.pfb></Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (6 pages, 1044996 bytes).
+Output written on report.pdf (6 pages, 1044616 bytes).
 PDF statistics:
- 143 PDF objects out of 1000 (max. 8388607)
+ 142 PDF objects out of 1000 (max. 8388607)
  23 named destinations out of 1000 (max. 500000)
  88 words of extra memory for PDF output out of 10000 (max. 10000000)
 

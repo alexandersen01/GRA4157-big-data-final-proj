@@ -189,7 +189,7 @@ class CNNClassifier:
         channels, height, width = self.input_shape
         X_tensor = torch.FloatTensor(X).view(-1, channels, height, width)
         
-        # Batched prediction to avoid OOM on large datasets/models
+        # batched prediction to avoid OOM on large datasets/models
         dataset = TensorDataset(X_tensor)
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
         

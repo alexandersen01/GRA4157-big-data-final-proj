@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex report"] 1764850282.30331 "report.aux" "report.bbl" "report" 1764851456.83289 0
+["bibtex report"] 1764852567.04083 "report.aux" "report.bbl" "report" 1764852568.69678 0
   "./sources.bib" 1764841735.6824 905 6a1fc2ae69fb48989730ffba9648b9da ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/bibtex/bst/bibtex/alpha.bst" 1744540097.96272 23907 a5f93555796fb564b924339521f10a7c ""
-  "report.aux" 1764851456.20163 2193 fc2514f9fd5ac41b5d2b7256bbdede7a "pdflatex"
+  "report.aux" 1764852568.0638 2193 24e5ebd9b46eb40b0d3ea98caa1453c5 "pdflatex"
   (generated)
   "report.bbl"
   "report.blg"
   (rewritten before read)
-["pdflatex"] 1764851455.32391 "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" "report.pdf" "report" 1764851456.83307 0
-  "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" 1764851454.76283 17222 25317e37daaba5f2ec2200d550f0fec7 ""
+["pdflatex"] 1764852567.342 "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" "report.pdf" "report" 1764852568.69696 0
+  "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" 1764852565.94797 17349 964e02956f4f7799fce7730948ddf054 ""
   "/Users/jakobsverrealexandersen/Library/Application" 1759479608.31476 58 5be58d25415c6b0826fe498532e200cf ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map" 1764165121.26312 83200 714e5c49571e26c699798bee0bf80c78 ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/miktex/data/le/pdftex/pdflatex.fmt" 1744540792.33739 12053120 514daef0bf02ba4323c4635a48e46f13 ""
@@ -125,11 +125,11 @@
   "figures/image.png" 1764524436.0648 37710 78cf7d03e60d1c8044f44ae2a73e66e7 ""
   "figures/image3.png" 1764525187.47524 867865 324734eca59a657feba80a0dc0a2fb31 ""
   "figures/image4.png" 1764841121.52925 45785 7ce22a3cbb9ecb1518ef3fe78ebfb258 ""
-  "report.aux" 1764851456.20163 2193 fc2514f9fd5ac41b5d2b7256bbdede7a "pdflatex"
-  "report.bbl" 1764850283.22654 617 8141043b05eeadf3473b113e92a33a49 "bibtex report"
-  "report.out" 1764851456.20386 1010 0130719bc129821aabde851271cf9739 "pdflatex"
-  "report.tex" 1764851454.76283 17222 25317e37daaba5f2ec2200d550f0fec7 ""
-  "report.toc" 1764851456.20547 677 e3e5b2e5afefcae233422b7fc7dbf728 "pdflatex"
+  "report.aux" 1764852568.0638 2193 24e5ebd9b46eb40b0d3ea98caa1453c5 "pdflatex"
+  "report.bbl" 1764852567.29632 617 8141043b05eeadf3473b113e92a33a49 "bibtex report"
+  "report.out" 1764852568.06561 1010 0130719bc129821aabde851271cf9739 "pdflatex"
+  "report.tex" 1764852565.94797 17349 964e02956f4f7799fce7730948ddf054 ""
+  "report.toc" 1764852568.0668 677 b70849d33f232ad333762b91dc6e2c47 "pdflatex"
   (generated)
   "report.aux"
   "report.log"

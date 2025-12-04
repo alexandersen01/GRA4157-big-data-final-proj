@@ -4,6 +4,6 @@
 \contentsline {subsection}{\numberline {2.2}Model Architectures}{4}{subsection.2.2}%
 \contentsline {subsubsection}{\numberline {2.2.1}Simple CNN (MNIST)}{4}{subsubsection.2.2.1}%
 \contentsline {subsubsection}{\numberline {2.2.2}FlexibleCNN}{4}{subsubsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.3}Design Choices}{4}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.3}Design Choices}{5}{subsection.2.3}%
 \contentsline {section}{\numberline {3}Results}{5}{section.3}%
 \contentsline {section}{\numberline {4}Summary}{6}{section.4}%
