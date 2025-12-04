@@ -8,5 +8,4 @@ notebook.ipynb
 Project_2.pdf 
 data/
 report/
-pyproject.toml
-uv.lock
+__pycache__
