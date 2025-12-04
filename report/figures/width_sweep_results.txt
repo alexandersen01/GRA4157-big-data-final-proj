@@ -1,5 +1,5 @@
 ==============================================================================================================
-Width-Sweep Double Descent Results Summary
+width-sweep DD results summary
 ==============================================================================================================
 
 Width      Params          Train Acc    Test Acc     Test F1      Test Error   Time (s)  
