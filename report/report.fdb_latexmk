@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex report"] 1764525330.18507 "report.aux" "report.bbl" "report" 1764525355.18715 0
-  "./sources.bib" 1762525781.66865 518 a0b591db62b50ab958a1ee0124cf6a58 ""
+["bibtex report"] 1764850282.30331 "report.aux" "report.bbl" "report" 1764851456.83289 0
+  "./sources.bib" 1764841735.6824 905 6a1fc2ae69fb48989730ffba9648b9da ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/bibtex/bst/bibtex/alpha.bst" 1744540097.96272 23907 a5f93555796fb564b924339521f10a7c ""
-  "report.aux" 1764525354.5574 919 6076d0c5a7e2a839407a96c68a6d8404 "pdflatex"
+  "report.aux" 1764851456.20163 2193 fc2514f9fd5ac41b5d2b7256bbdede7a "pdflatex"
   (generated)
   "report.bbl"
   "report.blg"
   (rewritten before read)
-["pdflatex"] 1764525353.88257 "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" "report.pdf" "report" 1764525355.18734 0
-  "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" 1764525353.16713 4767 1ec77055a2d5d9a1ae4de7558e34b46b ""
+["pdflatex"] 1764851455.32391 "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" "report.pdf" "report" 1764851456.83307 0
+  "/Users/jakobsverrealexandersen/Documents/GRA4157-big-data-final-proj/report/report.tex" 1764851454.76283 17222 25317e37daaba5f2ec2200d550f0fec7 ""
   "/Users/jakobsverrealexandersen/Library/Application" 1759479608.31476 58 5be58d25415c6b0826fe498532e200cf ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pdftex/pdftex.map" 1764165121.26312 83200 714e5c49571e26c699798bee0bf80c78 ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/data/miktex/data/le/pdftex/pdflatex.fmt" 1744540792.33739 12053120 514daef0bf02ba4323c4635a48e46f13 ""
@@ -34,6 +34,7 @@
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/tfm/public/fontawesome/FontAwesome--fontawesometwo.tfm" 1744540810.39745 1360 76c648952c3cfb458d3ca1d9dde7e9bf ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1744540084.58411 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1744540084.59617 35752 024fb6c41858982481f6968b5fc26508 ""
+  "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1744540084.60314 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1744540084.63084 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/fontawesome/FontAwesome.pfb" 1744540810.40771 173219 54847ac27638e1e28852258f5be2fa20 ""
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw/courier/ucrr8a.pfb" 1744540103.43421 45758 19968a0990191524e34e1994d4a31cb6 ""
@@ -123,11 +124,12 @@
   "/Users/jakobsverrealexandersen/Library/Application Support/MiKTeX/texmfs/install/tex/latex/xcolor/xcolor.sty" 1744540147.6956 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "figures/image.png" 1764524436.0648 37710 78cf7d03e60d1c8044f44ae2a73e66e7 ""
   "figures/image3.png" 1764525187.47524 867865 324734eca59a657feba80a0dc0a2fb31 ""
-  "report.aux" 1764525354.5574 919 6076d0c5a7e2a839407a96c68a6d8404 "pdflatex"
-  "report.bbl" 1764525330.5843 344 544f416a2349639ac84fa9ca32b0a780 "bibtex report"
-  "report.out" 1764525354.55943 434 4388f9bcac5c0d36dd1af68406fd3685 "pdflatex"
-  "report.tex" 1764525353.16713 4767 1ec77055a2d5d9a1ae4de7558e34b46b ""
-  "report.toc" 1764525354.56103 331 0b05b6e61d4601ee9e90204d7fc2add3 "pdflatex"
+  "figures/image4.png" 1764841121.52925 45785 7ce22a3cbb9ecb1518ef3fe78ebfb258 ""
+  "report.aux" 1764851456.20163 2193 fc2514f9fd5ac41b5d2b7256bbdede7a "pdflatex"
+  "report.bbl" 1764850283.22654 617 8141043b05eeadf3473b113e92a33a49 "bibtex report"
+  "report.out" 1764851456.20386 1010 0130719bc129821aabde851271cf9739 "pdflatex"
+  "report.tex" 1764851454.76283 17222 25317e37daaba5f2ec2200d550f0fec7 ""
+  "report.toc" 1764851456.20547 677 e3e5b2e5afefcae233422b7fc7dbf728 "pdflatex"
   (generated)
   "report.aux"
   "report.log"

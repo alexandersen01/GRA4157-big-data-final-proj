@@ -92,64 +92,6 @@ class FlexibleCNN(nn.Module):
         }
 
 
-def create_baseline_model(in_channels=3, num_classes=10, seed=42):
-    return FlexibleCNN(
-        in_channels=in_channels,
-        num_conv_blocks=2,
-        base_filters=16,
-        fc_hidden_dim=64,
-        num_classes=num_classes,
-        seed=seed,
-    )
-
-
-def create_medium_model(in_channels=3, num_classes=10, seed=42):
-    return FlexibleCNN(
-        in_channels=in_channels,
-        num_conv_blocks=3,
-        base_filters=32,
-        fc_hidden_dim=128,
-        num_classes=num_classes,
-        seed=seed,
-    )
-
-
-def create_high_model(in_channels=3, num_classes=10, seed=42):
-    return FlexibleCNN(
-        in_channels=in_channels,
-        num_conv_blocks=4,
-        base_filters=64,
-        fc_hidden_dim=256,
-        num_classes=num_classes,
-        seed=seed,
-    )
-
-
-def create_very_high_model(in_channels=3, num_classes=10, seed=42):
-    return FlexibleCNN(
-        in_channels=in_channels,
-        num_conv_blocks=4,
-        base_filters=128,
-        fc_hidden_dim=512,
-        num_classes=num_classes,
-        seed=seed,
-    )
-
-
-def create_extreme_model(in_channels=3, num_classes=10, seed=42):
-    """
-    Even higher-capacity model for probing the overparameterized regime.
-    """
-    return FlexibleCNN(
-        in_channels=in_channels,
-        num_conv_blocks=4,
-        base_filters=256,
-        fc_hidden_dim=1024,
-        num_classes=num_classes,
-        seed=seed,
-    )
-
-
 def create_width_scaled_model(width_multiplier, in_channels=3, num_classes=10, seed=42):
     """
     Create model with width scaled by multiplier (like ResNet18 width in the paper).
@@ -186,40 +128,12 @@ def get_width_multipliers_for_double_descent():
     - Medium widths (6-15): around interpolation threshold (peak error)
     - Large widths (16-128): overparameterized regime (where DD recovery happens)
 
-    Note: Using smaller training subset (10k) makes interpolation threshold 
+    Note: Using smaller training subset (10k) makes interpolation threshold
     easier to hit and the peak more pronounced.
     """
     # Fine-grained sampling around expected interpolation threshold
     # Extended to 128 to ensure we're well into overparameterized regime
     widths = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,  # underparameterized
-        12, 14, 16, 18, 20,              # around interpolation threshold
-        24, 32, 40, 48, 64, 80, 96, 128  # overparameterized
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 32, 40, 48, 64, 80, 96, 128
     ]
     return widths
-
-
-if __name__ == "__main__":
-    models = {
-        "Baseline": create_baseline_model(),
-        "Medium": create_medium_model(),
-        "High": create_high_model(),
-        "Very High": create_very_high_model(),
-        "Extreme": create_extreme_model(),
-    }
-
-    for name, model in models.items():
-        summary = model.get_architecture_summary()
-        print(f"\n{name} model:")
-        print(f"  conv blocks: {summary['num_conv_blocks']}")
-        print(f"  base filters: {summary['base_filters']}")
-        print(f"  FC hidden dim: {summary['fc_hidden_dim']}")
-        print(f"  total params: {summary['total_parameters']:,}")
-
-    # test forward pass
-    x = torch.randn(4, 3, 32, 32)  # Batch of 4 CIFAR-10 images
-    output = models["Baseline"](x)
-    print(f"Input shape: {x.shape}")
-    print(f"Output shape: {output.shape}")
-    assert tuple(output.shape) == (4, 10)
-    print("great success!")
